@@ -77,7 +77,7 @@
 			<c:forEach items="${obj.list}" var="acc">
 				<tr target="sid_account" rel="${acc.ID }">
 				<td><input name="ids" value="'${acc.ID}'" type="checkbox"></td>
-					<td>${acc.ID}</td>
+					<td>${acc.userName}</td>
 					<td>${acc.description}</td>
 					<td>${acc.password}</td>
 					<td>${acc.dName}</td>
@@ -86,9 +86,8 @@
 					<td>${acc.status==0?'有效':'无效'}</td>
 				<td>
 				<a title="删除用户信息" target="ajaxTodo" href="Account/delete?ID=${acc.ID}" class="btnDel">删除用户信息</a>
-				<%-- 
-				<a title="查看用户信息" target="dialog" href="Account/view?ID=${acc.ID}" class="btnView">查看用户信息</a>
-				--%>
+				<a title="授权" target="dialog" href="role/permUi?ID=${acc.ID}" class="btnView">授权</a>
+				<a title="添加角色" target="dialog" href="Account/roleUi?ID=${acc.ID}" class="btnView">添加角色</a>
 				<a title="编辑用户信息" target="dialog" href="Account/editUi?ID=${acc.ID}" class="btnEdit">编辑用户信息</a>
 				</td>
 				</tr>

@@ -43,13 +43,6 @@ public class DwzUtil {
 		return map;
 	}
 
-	/**
-	 * dwzAjax特殊情况提示信息
-	 * @param statusCode
-	 * @param navTabId
-	 * @param message
-	 * @return
-	 */
 	public static Map<String, Object> dialogAjaxDone(int statusCode,
 			String navTabId, String message) {
 		Map<String, Object> map = new HashMap<String, Object>();

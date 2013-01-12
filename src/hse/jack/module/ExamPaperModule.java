@@ -1,6 +1,6 @@
 package hse.jack.module;
 
-import hse.jack.model.BlanksProblem;
+import hse.jack.model.BaseProblem;
 import hse.jack.model.ExamMainPaper;
 import hse.jack.model.ExamPaperInfo;
 import hse.jack.model.JobInfos;
@@ -8,6 +8,7 @@ import hse.jack.model.TrainSubject;
 import hse.jack.util.DateUtil;
 import hse.jack.util.DwzUtil;
 import hse.jack.util.ExaminationUtil;
+import hse.jack.util.QuestionsType;
 import hse.jack.util.WebUtil;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
@@ -42,25 +44,19 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	private static final Log log = Logs.get();
 
 	/**
-	 * 跳转方法
+	 * 跳转人工组卷
 	 */
 	@At
 	@Ok("jsp:page.exam.rginput")
 	public Map<String, Object> rgaddUi() {
-		Map<String, Object> map = new HashMap<String, Object>();
 		try {
-			// 获取岗位信息
-			List<JobInfos> gwinfo = this.dao().query(JobInfos.class,
-					Cnd.orderBy().asc("ID"));
-			if (gwinfo != null)
-				map.put("gwinfo", gwinfo);
-			// 获取科目信息
-			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
-					Cnd.orderBy().asc("subID"));
-			if (subject != null)
-				map.put("subject", subject);
+			// 从session中获取岗位信息
+			@SuppressWarnings("unchecked")
+			Map<String, Object> infos = (Map<String, Object>) Mvcs
+					.getHttpSession().getAttribute("otherInfos");
+			// 获取试题
 
-			return WebUtil.success(map);
+			return WebUtil.success(infos);
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
@@ -68,6 +64,11 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 		}
 	}
 
+	/**
+	 * 跳转到自动组卷
+	 * 
+	 * @return
+	 */
 	@At
 	@Ok("jsp:page.exam.autoinput")
 	public Map<String, Object> autoAddUi() {
@@ -170,13 +171,140 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	}
 
 	/**
+	 * 检索不同的试题类型
+	 * 
+	 * @param pageNum
+	 * @param numPerPage
+	 * @param obj
+	 * @return
+	 */
+	@At
+	@Ok("jsp:page.exam.rginput")
+	public Object plist(@Param("pageNum") int pageNum,
+			@Param("numPerPage") int numPerPage, @Param("..") BaseProblem obj) {
+		Pager pager = dao().createPager((pageNum < 1) ? 1 : pageNum,
+				(numPerPage < 1) ? 20 : numPerPage);
+		List<BaseProblem> list = dao().query(BaseProblem.class,
+				bulidQureyCnd2(obj), pager);
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (pager != null) {
+			pager.setRecordCount(dao().count(BaseProblem.class,
+					bulidQureyCnd2(obj)));
+			map.put("pager", pager);
+		}
+		map.put("o", obj);
+		map.put("list", list);
+		return map;
+	}
+
+	/**
+	 * 检索不同的试题类型查询条件
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	private Cnd bulidQureyCnd2(BaseProblem obj) {
+		Cnd cnd = null;
+		if (null != obj) {
+			cnd = Cnd.where("1", "=", "1");
+		}
+		return cnd;
+	}
+
+	/**
+	 * 人工组卷方法
+	 * 
+	 * @param ids
+	 * @param obj
+	 * @return
+	 */
+	@At
+	public Object rgAdd(@Param("ids") String ids,
+			@Param("..") ExaminationUtil obj) {
+		log.debug("============" + ids);
+		log.debug("============" + obj.getTitle());
+		try {
+			// 试卷主表
+			/*
+			 * ExamMainPaper examMain = new ExamMainPaper();
+			 * examMain.setExName(obj.getTitle());
+			 * examMain.setExScore(Integer.parseInt(obj.getExscore()));
+			 * examMain.setExNdxs(obj.getNdxs() == null ? "" : obj.getNdxs());
+			 * examMain.setExSubject(obj.getExSuject());
+			 * examMain.setGwName(obj.getGwName());
+			 * examMain.setCreateUser(WebUtil.getLoginUser());
+			 * examMain.setCreateDate(DateUtil.getCurrentDate());
+			 * examMain.setRemark(obj.getRemark()); examMain.setStatus("0");
+			 */
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		}
+		return DwzUtil.dialogAjaxDone(DwzUtil.OK);
+	}
+
+	/**
+	 * 试卷内容查询
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	@At
+	@Ok("jsp:page.exam.view")
+	public Object view(@Param("..") ExamMainPaper obj) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			ExamMainPaper main = this.dao().fetch(obj);
+			if (main != null)
+				map.put("main", main);
+			List<ExamPaperInfo> infos = this.dao()
+					.fetchLinks(dao().fetch(obj), "examInfos").getExamInfos();
+			List<BaseProblem> judges = new ArrayList<BaseProblem>();
+			List<BaseProblem> sOptin = new ArrayList<BaseProblem>();
+			List<BaseProblem> mOPtion = new ArrayList<BaseProblem>();
+			List<BaseProblem> jdts = new ArrayList<BaseProblem>();
+			for (int i = 0; i < infos.size(); ++i) {
+				// 判断题
+				if (infos.get(i).getType().equals(QuestionsType.judge)) {
+					judges.add(this.dao().fetch(BaseProblem.class,
+							infos.get(i).getStNo()));
+				}
+				if (infos.get(i).getType().equals(QuestionsType.singleOption)) {
+					sOptin.add(this.dao().fetch(BaseProblem.class,
+							infos.get(i).getStNo()));
+				}
+
+				if (infos.get(i).getType().equals(QuestionsType.multipe)) {
+					mOPtion.add(this.dao().fetch(BaseProblem.class,
+							infos.get(i).getStNo()));
+				}
+
+				if (infos.get(i).getType().equals(QuestionsType.answer)) {
+					jdts.add(this.dao().fetch(BaseProblem.class,
+							infos.get(i).getStNo()));
+				}
+			}
+			map.put("judgeInfo", judges);
+			map.put("singles", sOptin);
+			map.put("mitInfos", mOPtion);
+			map.put("jdtInfo", jdts);
+
+			return WebUtil.success(map);
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		}
+	}
+
+	/**
 	 * 试卷自动生成办法
 	 * 
 	 * @param obj
 	 * @return
 	 */
 	@At
-	@Ok("json")
 	public Object autoAdd(@Param("..") ExaminationUtil obj) {
 		try {
 			// 试卷主表
@@ -192,40 +320,73 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 			examMain.setStatus("0");
 			// 定义保存题目内容的List
 			List<ExamPaperInfo> blanksList = new ArrayList<ExamPaperInfo>();
-			// 获取最大ID值，提供给下面进行随机出题ID范围。.
-			int maxID = this.dao().count(BlanksProblem.class);
-			// 获取用户需要的选择题的数量
-			int blankSelectNo = obj.getBlanksNum();
-			// 定义一个保存填空题题ID的不重复整型数组
-			int[] arrB = new int[blankSelectNo];
-			// 随机生成填空题题号
-			for (int i = 0; i < blankSelectNo; ++i) {
-				arrB[i] = (int) (Math.random() * maxID) + 1;
-				if (fetchID(arrB[i]) != null) {
-					for (int j = 0; j < i; j++) {
-						if (arrB[j] == arrB[i]) {
-							i--;
-							break;
-						}
-					}
-				} else {
-					i--;
-				}
-			}
-			// 把不重复保存到list中
-			for (int j = 0; j < blankSelectNo; ++j) {
-				BlanksProblem blanks = fetchID(arrB[j]);
+			List<BaseProblem> judges = this.dao().query(BaseProblem.class,
+					bulidQureyCnd1(obj, "判断题", null),
+					dao().createPager(1, obj.getJudgesNum()));
+			for (int j = 0; j < judges.size(); ++j) {
 				ExamPaperInfo info = new ExamPaperInfo();
-				info.setStNo(blanks.gettID());
-				info.setDaDoc(blanks.getAnswer());
+				info.setStNo(judges.get(j).getpID());
+				info.setDaDoc(judges.get(j).getAnswer());
+				info.setType(QuestionsType.judge);
 				info.setStatus("0");
 				blanksList.add(info);
-				log.info("-------------" + blanks.gettID());
 			}
 			// 插入数据
 			examMain.setExamInfos(blanksList);
+			// this.dao().insertWith(examMain, "examInfos");
+			/**
+			 * 单选题
+			 */
+			List<BaseProblem> singleOption = this.dao().query(
+					BaseProblem.class, bulidQureyCnd1(obj, "选择题", "0"),
+					dao().createPager(1, obj.getSingleOptionNum()));
+			// 把不重复保存到list中
+			for (int j = 0; j < singleOption.size(); ++j) {
+				ExamPaperInfo info = new ExamPaperInfo();
+				info.setStNo(singleOption.get(j).getpID());
+				info.setDaDoc(singleOption.get(j).getAnswer());
+				info.setType(QuestionsType.singleOption);
+				info.setStatus("0");
+				blanksList.add(info);
+			}
+			// 插入数据
+			examMain.setExamInfos(blanksList);
+			/**
+			 * 多选题
+			 */
+			// 获取多选题内容
+			List<BaseProblem> doubleOp = this.dao().query(BaseProblem.class,
+					bulidQureyCnd1(obj, "选择题", "1"),
+					dao().createPager(1, obj.getDoubleOptionNum()));
+			for (int i = 0; i < doubleOp.size(); ++i) {
+				ExamPaperInfo info = new ExamPaperInfo();
+				info.setStNo(doubleOp.get(i).getpID());
+				info.setDaDoc(doubleOp.get(i).getAnswer());
+				info.setType(QuestionsType.multipe);
+				info.setStatus("0");
+				blanksList.add(info);
+			}
+			examMain.setExamInfos(blanksList);
+			/**
+			 * 解答题
+			 */
+			// 获取解答题内容
+			List<BaseProblem> examJdt = this.dao().query(BaseProblem.class,
+					bulidQureyCnd1(obj, "解答题", null),
+					dao().createPager(1, obj.getJdtNum()));
+			if (examJdt != null)
+				for (int i = 0; i < examJdt.size(); ++i) {
+					ExamPaperInfo info = new ExamPaperInfo();
+					info.setStNo(examJdt.get(i).getpID());
+					info.setDaDoc(examJdt.get(i).getAnswer());
+					info.setType(QuestionsType.answer);
+					info.setStatus("0");
+					blanksList.add(info);
+				}
+			examMain.setExamInfos(blanksList);
 			this.dao().insertWith(examMain, "examInfos");
-			return DwzUtil.dialogAjaxDone(DwzUtil.OK);
+
+			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "examMain");
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
@@ -234,30 +395,38 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	}
 
 	/**
-	 * 根据ID查询填空題目信息
+	 * 构建查询方法1
 	 * 
 	 * @param obj
 	 * @return
 	 */
-	public BlanksProblem fetchID(int obj) {
-		return this.dao().fetch(BlanksProblem.class, (long) obj);
-	}
-
-	/**
-	 * 新增-试卷信息
-	 * 
-	 * @return
-	 */
-	@At
-	public Object add(@Param("..") ExamMainPaper obj) {
-		try {
-			dao().insert(obj);
-			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "examMain");
-		} catch (Throwable e) {
-			if (log.isDebugEnabled())
-				log.debug("E!!", e);
-			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+	private Cnd bulidQureyCnd1(ExaminationUtil obj, String choice, String typeID) {
+		final String op = "=";
+		Cnd cnd = null;
+		if (obj != null && !Strings.isEmpty(choice)) {
+			cnd = Cnd.where("1", op, "1");
+			/** 难易程度 **/
+			if (!Strings.isEmpty(obj.getNdxs())) {
+				cnd.and("ndxs", op, obj.getNdxs());
+			}
+			/** 科目信息 **/
+			if (!Strings.isEmpty(obj.getExSuject())) {
+				cnd.and("sujectID", op, obj.getExSuject());
+			}
+			/** 岗位信息 **/
+			if (!Strings.isEmpty(obj.getGwName())) {
+				cnd.and("gwID", op, obj.getGwName());
+			}
+			/** 仅仅使用于选择题目 **/
+			if (!Strings.isEmpty(typeID)) {
+				cnd.and("typeID", op, typeID);
+			}
+			/** 类型 **/
+			if (!Strings.isEmpty(choice)) {
+				cnd.and("type", op, choice).asc("dbms_random.value");
+			}
 		}
+		return cnd;
 	}
 
 	/**
@@ -268,7 +437,10 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	@At
 	public Object delete(@Param("..") ExamMainPaper obj) {
 		try {
-			dao().delete(obj);
+			// 删除试卷信息及其子表中信息
+			this.dao().fetchLinks(obj, "examInfos");
+			this.dao().deleteWith(obj, "examInfos");
+
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK);
 		} catch (Throwable e) {
 			if (log.isDebugEnabled())
@@ -317,6 +489,36 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	}
 
 	/**
+	 * 构建岗位和科目信息
+	 * 
+	 * 未完成
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public Map<String, Object> buildRetrunValue(Object obj) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			// 获取岗位信息
+			List<JobInfos> gwinfo = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("ID"));
+			if (gwinfo != null)
+				map.put("gwinfo", gwinfo);
+			// 获取科目信息
+			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
+					Cnd.orderBy().asc("subID"));
+			if (subject != null)
+				map.put("subject", subject);
+
+			return WebUtil.success(map);
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		}
+	}
+
+	/**
 	 * 构建查询条件
 	 * 
 	 * @param obj
@@ -330,6 +532,10 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 			cnd = Cnd.where("1", "=", "1");
 			if (!Strings.isEmpty(obj.getExName())) {
 				cnd.and("exName", "like", "%" + obj.getExName() + "%");
+			}
+			/** 岗位信息 **/
+			if (!Strings.isEmpty(obj.getGwName())) {
+				cnd.and("gwName", op, obj.getGwName());
 			}
 			/** 根据培训类容名称 **/
 			if (!Strings.isEmpty(obj.getExSubject())) {
@@ -354,18 +560,4 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 		}
 		return cnd;
 	}
-
-	@At
-	public void insert() {
-		ExamMainPaper main = new ExamMainPaper();
-		main.setExName("dddddddddddd");
-		main.setExID(11);
-		List<ExamPaperInfo> infoList = new ArrayList<ExamPaperInfo>();
-		infoList.add(new ExamPaperInfo(1111));
-		infoList.add(new ExamPaperInfo(12221));
-		infoList.add(new ExamPaperInfo(13331));
-		main.setExamInfos(infoList);
-		this.dao().insertWith(main, "examInfos");
-	}
-
 }

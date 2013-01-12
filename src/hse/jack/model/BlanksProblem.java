@@ -10,7 +10,6 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Readonly;
 import org.nutz.dao.entity.annotation.Table;
-import org.nutz.dao.entity.annotation.View;
 
 /**
  * <b>填空题基本类</b>
@@ -21,7 +20,7 @@ import org.nutz.dao.entity.annotation.View;
  * 
  */
 @Table("HSE_EXAM_TKTINFO")
-@View("V_HSE_EXAM_TKTINFO")
+// @View("V_HSE_EXAM_TKTINFO")
 public class BlanksProblem implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -28,7 +28,7 @@ public class GradeInfo implements Serializable {
 	private int SID;
 	/** 员工ID **/
 	@Column("EID")
-	private int employeeID;
+	private int empID;
 	/** 岗位信息 **/
 	@Column("GWNAME")
 	private int gwName;
@@ -52,7 +52,7 @@ public class GradeInfo implements Serializable {
 	/***
 	 * 一对一关联员工信息
 	 */
-	@One(target = EmployeeInfo.class, field = "employeeID")
+	@One(target = EmployeeInfo.class, field = "empID")
 	private EmployeeInfo employeeInfo;
 
 	/** 以下内容为view查看之用 **/
@@ -92,12 +92,12 @@ public class GradeInfo implements Serializable {
 		SID = sID;
 	}
 
-	public int getEmployeeID() {
-		return employeeID;
+	public int getEmpID() {
+		return empID;
 	}
 
-	public void setEmployeeID(int employeeID) {
-		this.employeeID = employeeID;
+	public void setEmpID(int empID) {
+		this.empID = empID;
 	}
 
 	public int getGwName() {

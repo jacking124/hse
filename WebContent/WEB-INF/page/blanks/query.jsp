@@ -3,14 +3,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="page">
 	<div class="pageContent">
-		<form method="post" action="Blanks/list" class="pageForm"
+		<form method="post" action="blanks/list" class="pageForm"
 			onsubmit="return navTabSearch(this, 'blanks');">
 			<div class="pageFormContent" layoutH="58">
 				<!-- 				<div> -->
 				<!-- 					<label>请输入检索条件：</label> -->
 				<!-- 					<input type="text" size="50" minlength="3" maxlength="10"/> -->
 				<!-- 				</div> -->
-				<div class="divDeider">divDeider</div>
 				<div>
 					<label>科目名称：</label> <select name="subjectID" class="combox"
 						class="required">
@@ -19,21 +18,24 @@
 						</c:forEach>
 					</select><span class="inputInfo">科目名称</span>
 				</div>
+				<br>
 				<div>
-					<label>岗位名称：</label> <select name="gwName" class="combox"
+					<label>岗位名称：</label> <select name="gwID" class="combox"
 						class="required">
 						<c:forEach var="di" items="${obj.gwinfo}">
 							<option value="${di.ID}">${di.gwName}</option>
 						</c:forEach>
 					</select><span class="inputInfo">岗位名称</span>
 				</div>
+				<br>
 				<div>
 					<label>备注信息：</label> <input type="text" name="remark"
 						value="${obj.remark}" size="25" /> <span class="inputInfo">备注信息</span>
 				</div>
+				<br>
 				<div>
 					<label>状态：</label> <input type="text" name="status"
-						value="${obj.status}" size="25" /> <span class="inputInfo">岗位状态</span>
+						value="${obj.status}" size="25" /> <span class="inputInfo">状态</span>
 				</div>
 				<%-- 			    <div>
 					<label>创建人：</label>

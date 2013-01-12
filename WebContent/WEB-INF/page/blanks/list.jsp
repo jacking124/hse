@@ -2,19 +2,19 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<form id="pagerForm" method="post" action="Blanks/list">
+<form id="pagerForm" method="post" action="blanks/list">
 	<input type="hidden" name="pageNum" value="${obj.pager.pageNumber}" />
 	<input type="hidden" name="numPerPage" value="${obj.pager.pageSize}" />
 	<input type="hidden" name="orderField" value="${param.orderField}" />
 </form>
 <div class="pageHeader">
-	<form onsubmit="return navTabSearch(this);" action="Blanks/list"
+	<form onsubmit="return navTabSearch(this);" action="blanks/list"
 		method="post">
 		<div class="searchBar">
 			<table class="searchContent">
 				<tr>
 					<td>题目内容：<input type="text" name="content"
-						value="${obj.o.content}" /></td>
+						value="${obj.o.pContent}" /></td>
 					<td>题目状态：<input type="text" name="status"
 						value="${obj.o.status}" /></td>
 				</tr>
@@ -26,7 +26,7 @@
 								<button type="submit">检索</button>
 							</div>
 						</div></li>
-					<li><a class="button" href="Blanks/queryUi" target="dialog"
+					<li><a class="button" href="blanks/queryUi" target="dialog"
 						mask="true" title="查询框"><span>高级检索</span></a></li>
 				</ul>
 			</div>
@@ -36,11 +36,11 @@
 <div class="pageContent">
 	<div class="panelBar">
 		<ul class="toolBar">
-			<li><a class="add" href="Blanks/addUi" target="navTab" mask="true"
+			<li><a class="add" href="blanks/addUi" target="navTab" mask="true"
 				rel="newPage" title="添加填空题信息"><span>添加</span></a></li>
 			<li><a title="确实要删除这些记录吗?" target="selectedTodo" rel="ids"
-				postType="string" href="Blanks/delByIds" class="delete"><span>批量删除</span></a></li>
-			<li><a class="edit" href="Blanks/editUi?tID={sid_blanks}"
+				postType="string" href="blanks/delByIds" class="delete"><span>批量删除</span></a></li>
+			<li><a class="edit" href="blanks/editUi?pID={sid_blanks}"
 				target="dialog" mask="true" title="修改填空题信息"><span>修改</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="#" target="dwzExport"
@@ -63,20 +63,20 @@
 		</thead>
 		<tbody>
 			<c:forEach items="${obj.list}" var="acc">
-				<tr target="sid_blanks" rel="${acc.tID }">
-					<td><input name="ids" value="'${acc.tID}'" type="checkbox"></td>
-					<td>${acc.content}</td>
+				<tr target="sid_blanks" rel="${acc.pID }">
+					<td><input name="ids" value="'${acc.pID}'" type="checkbox"></td>
+					<td>${acc.pContent}</td>
 					<td>${acc.subjectName}</td>
-					<td>${acc.gwInfo}</td>
+					<td>${acc.gwName}</td>
 					<td>${acc.ndxs}</td>
 					<td>${acc.remark}</td>
 					<td>${acc.status==0?'有效':'无效'}</td>
 
 					<td><a title="删填空题信息" target="ajaxTodo"
-						href="Blanks/delete?tID=${acc.tID}" class="btnDel">删除填空题信息</a> <a
-						title="查看填空题信息" target="dialog" href="Blanks/view?tID=${acc.tID}"
+						href="blanks/delete?pID=${acc.pID}" class="btnDel">删除填空题信息</a> <a
+						title="查看填空题信息" target="dialog" href="blanks/view?pID=${acc.pID}"
 						class="btnView">查看部门信息</a> <a title="编辑填空题信息" target="dialog"
-						href="Blanks/editUi?tID=${acc.tID}" class="btnEdit">编辑填空题信息</a></td>
+						href="blanks/editUi?pID=${acc.pID}" class="btnEdit">编辑填空题信息</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>

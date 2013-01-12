@@ -14,7 +14,7 @@
 			<table class="searchContent">
 				<tr>
 					<td>题目内容：<input type="text" name="content"
-						value="${obj.o.content}" /></td>
+						value="${obj.o.pContent}" /></td>
 					<td>题目状态：<input type="text" name="status"
 						value="${obj.o.status}" /></td>
 				</tr>
@@ -65,9 +65,9 @@
 			<c:forEach items="${obj.list}" var="acc">
 				<tr target="sid_eaxmJudge" rel="${acc.pID }">
 					<td><input name="ids" value="'${acc.pID}'" type="checkbox"></td>
-					<td>${acc.content}</td>
-					<td>${acc.subName}</td>
-					<td>${acc.gwInfo}</td>
+					<td>${acc.pContent}</td>
+					<td>${acc.subjectName}</td>
+					<td>${acc.gwName}</td>
 					<td>${acc.ndxs}</td>
 					<td>${acc.remark}</td>
 					<td>${acc.status==0?'有效':'无效'}</td>

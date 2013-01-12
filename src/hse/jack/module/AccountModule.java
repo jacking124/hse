@@ -2,6 +2,9 @@ package hse.jack.module;
 
 import hse.jack.model.Account;
 import hse.jack.model.Department;
+import hse.jack.model.JobInfos;
+import hse.jack.model.SysRoleUser;
+import hse.jack.model.TrainSubject;
 import hse.jack.util.DateUtil;
 import hse.jack.util.DwzUtil;
 import hse.jack.util.WebUtil;
@@ -20,6 +23,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
@@ -61,8 +65,36 @@ public class AccountModule extends EntityService<Account> {
 		if (null != account) {
 			flag = true;
 			session.setAttribute("account", account);
+			// 将岗位信息和科目信息保存到session中
+			addInfoToSession(session);
 		}
 		return flag;
+	}
+
+	/**
+	 * 将岗位信息和科目信息保存到session中
+	 * 
+	 * @param session
+	 */
+	public void addInfoToSession(HttpSession session) {
+		log.debug("I coming!");
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			// 获取岗位信息
+			List<JobInfos> gwinfo = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("ID"));
+			if (gwinfo != null)
+				map.put("gwinfo", gwinfo);
+			// 获取科目信息
+			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
+					Cnd.orderBy().asc("subID"));
+			if (subject != null)
+				map.put("subject", subject);
+			session.setAttribute("otherInfos", map);
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!!" + e);
+		}
 	}
 
 	/**
@@ -124,6 +156,18 @@ public class AccountModule extends EntityService<Account> {
 	}
 
 	/**
+	 * 跳转到修改密码页面
+	 * 
+	 * @return
+	 */
+	@At
+	@Ok("jsp:page.account.passwd")
+	public Account passwdUi() {
+		Account obj = (Account) Mvcs.getHttpSession().getAttribute("account");
+		return this.dao().fetch(obj);
+	}
+
+	/**
 	 * 跳转到查看页面
 	 */
 	@At
@@ -138,6 +182,18 @@ public class AccountModule extends EntityService<Account> {
 	@At
 	@Ok("jsp:page.account.query")
 	public void queryUi() {
+	}
+
+	/**
+	 * 跳转到添加角色页面
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	@At
+	@Ok("jsp:page.role.grantRole")
+	public Object roleUi(@Param("..") Account obj) {
+		return this.dao().fetch(SysRoleUser.class, obj.getID()).getRoleID();
 	}
 
 	/**
@@ -175,10 +231,6 @@ public class AccountModule extends EntityService<Account> {
 	@At
 	public Object add(@Param("..") Account obj) {
 		try {
-			Account account = this.dao().fetch(Account.class,
-					bulidQureyCnd(obj));
-			if (null != account)
-				return DwzUtil.dialogAjaxDone(DwzUtil.FAIL, null, "该用户名已经存在！");
 			// 设置创建人
 			obj.setCreateUser(WebUtil.getLoginUser());
 			// 设置创建时间
@@ -238,10 +290,6 @@ public class AccountModule extends EntityService<Account> {
 	@At
 	public Object update(@Param("..") Account obj) {
 		try {
-			Account account = this.dao().fetch(Account.class,
-					bulidQureyCnd(obj));
-			if (null != account)
-				return DwzUtil.dialogAjaxDone(DwzUtil.FAIL, null, "该用户名已经存在！");
 			// 设置创建人
 			obj.setCreateUser(WebUtil.getLoginUser());
 			// 设置创建时间

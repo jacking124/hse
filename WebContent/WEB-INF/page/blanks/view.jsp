@@ -6,12 +6,12 @@
 	<div class="viewInfo" layoutH="97">
 		<dl>
 			<dt>题目内容：</dt>
-			<dd>${obj.content}</dd>
+			<dd>${obj.pContent}</dd>
 		</dl>
 
 		<dl>
 			<dt>岗位：</dt>
-			<dd>${obj.gwInfo}</dd>
+			<dd>${obj.gwName}</dd>
 		</dl>
 		<dl>
 			<dt>难度系数：</dt>

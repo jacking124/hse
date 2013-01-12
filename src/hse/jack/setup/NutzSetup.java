@@ -1,6 +1,7 @@
 package hse.jack.setup;
 
 import hse.jack.model.Account;
+import hse.jack.model.BaseProblem;
 import hse.jack.model.BlanksProblem;
 import hse.jack.model.Department;
 import hse.jack.model.EmployeeInfo;
@@ -42,7 +43,10 @@ public class NutzSetup implements Setup {
 				dao.create(OptionProblem.class, false);
 				dao.create(ExamMainPaper.class, false);
 				dao.create(ExamPaperInfo.class, false);
+				dao.create(BaseProblem.class, false);
 			}
 		}
 	}
+	// 初始化
+
 }

@@ -23,10 +23,26 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.service.EntityService;
 
-@At("/Blanks")
+@At("/Blank")
 @IocBean(fields = { "dao" })
 public class BlanksProblemModule extends EntityService<BlanksProblem> {
 	private static final Log log = Logs.get();
+
+	/**
+	 * 检测数值是不是超过目前最大的
+	 * 
+	 * @param blanksNum
+	 * @return
+	 */
+	@At
+	@Ok("json")
+	public Boolean IsCount(@Param("blanksNum") int blanksNum) {
+		if (blanksNum > 0 && this.dao().count(BlanksProblem.class) < blanksNum) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	/**
 	 * 跳转到添加页面

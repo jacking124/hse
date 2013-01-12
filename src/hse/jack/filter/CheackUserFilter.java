@@ -47,7 +47,6 @@ public class CheackUserFilter implements Filter {
 		String url = request.getRequestURI();
 		String toUrl = request.getContextPath() + "/login.jsp";
 		Object obj = request.getSession().getAttribute("account");
-
 		if (url.indexOf("/HSE/") >= 0) {
 			if (!url.matches(IGNORE) && obj == null) {
 				if (!url.endsWith("login.jsp") && url.indexOf("login") < 0) {

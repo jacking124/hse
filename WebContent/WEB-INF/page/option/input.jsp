@@ -6,19 +6,20 @@
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, navTabAjaxDone);">
 		<div class="pageFormContent" layoutH="56">
-			<input type="hidden" name="ID" value="${obj.zID}">
+			<input type="hidden" name="pID" value="${obj.pID}">
+			<input type="hidden" name="type" value="选择题">
 			<fieldset>
 				<legend>选择题添加内容</legend>
 				<dl class="nowrap">
 					<dt>解答题目：</dt>
 					<dd>
-						<textarea name="content" cols="80" rows="3" class="required"></textarea>
+						<textarea name="pContent" cols="80" rows="3" class="required"></textarea>
 					</dd>
 				</dl>
 				<dl class="nowrap">
 					<dt>类型：</dt>
 					<dd>
-						<select name="type" class="combox" class="required">
+						<select name="typeID" class="combox" class="required">
 							<option value="0">---单选题---</option>
 							<option value="1">---多选题---</option>
 						</select>
@@ -27,7 +28,7 @@
 				<dl class="nowrap">
 					<dt>科目名称：</dt>
 					<dd>
-						<select name="subjectName" class="combox" class="required">
+						<select name="subjectID" class="combox" class="required">
 							<c:forEach var="di" items="${obj.subject}">
 								<option value="${di.subID}">${di.subName}</option>
 							</c:forEach>
@@ -59,7 +60,7 @@
 					</dd>
 				</dl>
 				<p>
-					<label>岗位信息：</label> <select name="gwName" class="combox"
+					<label>岗位信息：</label> <select name="gwID" class="combox"
 						class="required">
 						<c:forEach var="di" items="${obj.gwinfo}">
 							<option value="${di.ID}">${di.gwName}</option>
@@ -68,9 +69,9 @@
 				</p>
 				<p>
 					<label>难度系数：</label> <select name="ndxs" class="combox">
-						<option value="1">一般难度</option>
-						<option value="2">中间难度</option>
-						<option value="3">高难度</option>
+						<option value="初级">一般难度</option>
+						<option value="中级">中间难度</option>
+						<option value="高级">高难度</option>
 					</select>
 				</p>
 				<dl class="nowrap">

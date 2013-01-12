@@ -14,7 +14,7 @@
 			<table class="searchContent">
 				<tr>
 					<td>题目内容：<input type="text" name="content"
-						value="${obj.o.content}" /></td>
+						value="${obj.o.pContent}" /></td>
 					<td>题目状态：<input type="text" name="status"
 						value="${obj.o.status}" /></td>
 				</tr>
@@ -40,7 +40,7 @@
 				rel="newPage" title="添加解答题信息"><span>添加</span></a></li>
 			<li><a title="确实要删除这些记录吗?" target="selectedTodo" rel="ids"
 				postType="string" href="Jdt/delByIds" class="delete"><span>批量删除</span></a></li>
-			<li><a class="edit" href="Jdt/editUi?jID={sid_eaxmjdt}"
+			<li><a class="edit" href="Jdt/editUi?pID={sid_eaxmjdt}"
 				target="dialog" mask="true" title="修改解答题信息"><span>修改</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="#" target="dwzExport"
@@ -63,20 +63,20 @@
 		</thead>
 		<tbody>
 			<c:forEach items="${obj.list}" var="acc">
-				<tr target="sid_eaxmjdt" rel="${acc.jID }">
-					<td><input name="ids" value="'${acc.jID}'" type="checkbox"></td>
-					<td>${acc.content}</td>
+				<tr target="sid_eaxmjdt" rel="${acc.pID }">
+					<td><input name="ids" value="'${acc.pID}'" type="checkbox"></td>
+					<td>${acc.pContent}</td>
 					<td>${acc.subjectName}</td>
-					<td>${acc.gwInfo}</td>
+					<td>${acc.gwName}</td>
 					<td>${acc.ndxs}</td>
 					<td>${acc.remark}</td>
 					<td>${acc.status==0?'有效':'无效'}</td>
 
 					<td><a title="删解答题信息" target="ajaxTodo"
-						href="Jdt/delete?jID=${acc.jID}" class="btnDel">删除解答题信息</a> <a
-						title="查看解答题信息" target="dialog" href="Jdt/view?jID=${acc.jID}"
+						href="Jdt/delete?pID=${acc.pID}" class="btnDel">删除解答题信息</a> <a
+						title="查看解答题信息" target="dialog" href="Jdt/view?pID=${acc.pID}"
 						class="btnView">查看部门信息</a> <a title="编辑解答题信息" target="dialog"
-						href="Jdt/editUi?jID=${acc.jID}" class="btnEdit">编辑解答题信息</a></td>
+						href="Jdt/editUi?pID=${acc.pID}" class="btnEdit">编辑解答题信息</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>

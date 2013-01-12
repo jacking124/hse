@@ -1,7 +1,7 @@
 package hse.jack.module;
 
+import hse.jack.model.BaseProblem;
 import hse.jack.model.JobInfos;
-import hse.jack.model.OptionProblem;
 import hse.jack.model.TrainSubject;
 import hse.jack.util.DwzUtil;
 import hse.jack.util.WebUtil;
@@ -33,7 +33,7 @@ import org.nutz.service.EntityService;
 
 @At("/Option")
 @IocBean(fields = { "dao" })
-public class OptionProblemModule extends EntityService<OptionProblem> {
+public class OptionProblemModule extends EntityService<BaseProblem> {
 	private static final Log log = Logs.get();
 
 	/**
@@ -68,7 +68,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 */
 	@At
 	@Ok("jsp:page.option.edit")
-	public Map<String, Object> editUi(@Param("..") OptionProblem obj) {
+	public Map<String, Object> editUi(@Param("..") BaseProblem obj) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			// 获取岗位信息
@@ -83,7 +83,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 			if (subject != null)
 				map.put("subject", subject);
 			// 获取对象
-			OptionProblem option = this.dao().fetch(obj);
+			BaseProblem option = this.dao().fetch(obj);
 			if (option != null)
 				map.put("optionP", option);
 			return WebUtil.success(map);
@@ -99,7 +99,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 */
 	@At
 	@Ok("jsp:page.option.view")
-	public OptionProblem view(@Param("..") OptionProblem obj) {
+	public BaseProblem view(@Param("..") BaseProblem obj) {
 		return dao().fetch(obj);
 	}
 
@@ -108,7 +108,26 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 */
 	@At
 	@Ok("jsp:page.option.query")
-	public void queryUi() {
+	public Map<String, Object> queryUi() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			// 获取岗位信息
+			List<JobInfos> jobinfos = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("id"));
+			if (jobinfos == null)
+				return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+			map.put("gwinfo", jobinfos);
+			// 获取科目信息
+			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
+					Cnd.orderBy().asc("subID"));
+			if (subject != null)
+				map.put("subject", subject);
+			return WebUtil.success(map);
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		}
 	}
 
 	/**
@@ -123,14 +142,14 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	@At
 	@Ok("jsp:page.option.list")
 	public Object list(@Param("pageNum") int pageNum,
-			@Param("numPerPage") int numPerPage, @Param("..") OptionProblem obj) {
+			@Param("numPerPage") int numPerPage, @Param("..") BaseProblem obj) {
 		Pager pager = dao().createPager((pageNum < 1) ? 1 : pageNum,
 				(numPerPage < 1) ? 20 : numPerPage);
-		List<OptionProblem> list = dao().query(OptionProblem.class,
+		List<BaseProblem> list = dao().query(BaseProblem.class,
 				bulidQureyCnd(obj), pager);
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (pager != null) {
-			pager.setRecordCount(dao().count(OptionProblem.class,
+			pager.setRecordCount(dao().count(BaseProblem.class,
 					bulidQureyCnd(obj)));
 			map.put("pager", pager);
 		}
@@ -145,7 +164,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 * @return
 	 */
 	@At
-	public Object add(@Param("..") OptionProblem obj) {
+	public Object add(@Param("..") BaseProblem obj) {
 		try {
 			dao().insert(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "option");
@@ -162,7 +181,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 * @return
 	 */
 	@At
-	public Object delete(@Param("..") OptionProblem obj) {
+	public Object delete(@Param("..") BaseProblem obj) {
 		try {
 			dao().delete(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK);
@@ -200,7 +219,7 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 * @return
 	 */
 	@At
-	public Object update(@Param("..") OptionProblem obj) {
+	public Object update(@Param("..") BaseProblem obj) {
 		try {
 			dao().update(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "option");
@@ -217,14 +236,14 @@ public class OptionProblemModule extends EntityService<OptionProblem> {
 	 * @param obj
 	 * @return
 	 */
-	private Cnd bulidQureyCnd(OptionProblem obj) {
+	private Cnd bulidQureyCnd(BaseProblem obj) {
 		Cnd cnd = null;
 		if (obj != null) {
-			cnd = Cnd.where("1", "=", 1);
-			if (!Strings.isEmpty(obj.getContent()))
-				cnd.and("dName", "like", "%" + obj.getContent() + "%");
-			if (!Strings.isEmpty(obj.getType())) {
-				cnd.and("type", "=", obj.getType());
+			cnd = Cnd.where("type", "=", "选择题");
+			if (!Strings.isEmpty(obj.getpContent()))
+				cnd.and("dName", "like", "%" + obj.getpContent() + "%");
+			if (!Strings.isEmpty(obj.getTypeID())) {
+				cnd.and("typeID", "=", obj.getTypeID());
 			}
 			if (!Strings.isEmpty(obj.getStatus()))
 				cnd.and("status", "=", obj.getStatus());

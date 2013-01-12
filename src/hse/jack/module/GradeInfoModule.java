@@ -139,7 +139,7 @@ public class GradeInfoModule extends EntityService<GradeInfo> {
 			List<GradeInfo> gradeInfo = new ArrayList<GradeInfo>();
 			obj.setKsDate(DateUtil.getCurrentDate(obj.getKsDate()));
 			gradeInfo.add(obj);
-			System.out.println(obj.getEmployeeID());
+			System.out.println(obj.getEmpID());
 			employee.setScores(gradeInfo);
 			dao().insertWith(employee, "scores");
 			// dao().insert(obj);

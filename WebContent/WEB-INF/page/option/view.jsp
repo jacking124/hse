@@ -4,12 +4,10 @@
 <h2 class="contentTitle">用戶信查看页面</h2>
 <div class="pageContent">
 	<div class="viewInfo" layoutH="97">
-
-
 		<fieldset>
 			<legend>选择题详细信息</legend>
 			<p>
-				<label>题目内容：</label> ${obj.content}
+				<label>题目内容：</label> ${obj.pContent}
 			</p>
 			<dl>
 				<dt>类型：</dt>
@@ -33,7 +31,7 @@
 			</dl>
 			<dl>
 				<dt>岗位：</dt>
-				<dd>${obj.gwInfo}</dd>
+				<dd>${obj.gwName}</dd>
 			</dl>
 			<dl>
 				<dt>难度系数：</dt>

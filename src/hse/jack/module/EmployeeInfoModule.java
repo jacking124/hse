@@ -2,12 +2,28 @@ package hse.jack.module;
 
 import hse.jack.model.Department;
 import hse.jack.model.EmployeeInfo;
+import hse.jack.model.JobInfos;
+import hse.jack.util.DateUtil;
 import hse.jack.util.DwzUtil;
+import hse.jack.util.UUIDUtil;
+import hse.jack.util.UploadUtil;
 import hse.jack.util.WebUtil;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jxl.Sheet;
+import jxl.Workbook;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
@@ -17,9 +33,12 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mvc.annotation.AdaptBy;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.upload.TempFile;
+import org.nutz.mvc.upload.UploadAdaptor;
 import org.nutz.service.EntityService;
 
 /**
@@ -37,6 +56,123 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 	private static final Log log = Logs.get();
 
 	/**
+	 * 导出到excel表格
+	 * 
+	 * @param obj
+	 * @param request
+	 * @return
+	 */
+	public Object export(@Param("..") EmployeeInfo obj,
+			HttpServletRequest request, HttpServletResponse response) {
+		String[] title = { "姓名", "单位", "部门", "性别", "民族", "出生年月", "学历", "专业",
+				"毕业时间", "工作时间", "岗位", "任职时间", "职称", "技能等级", };
+
+		return null;
+	}
+
+	/**
+	 * 跳转到导入页面
+	 */
+	@At
+	@Ok("jsp:page.employee.excelFile")
+	public void dataUI() {
+
+	}
+
+	/**
+	 * 通过excel导入到数据库
+	 * 
+	 * @param excelFilePath
+	 *            文件路径
+	 * @param request
+	 * @return
+	 */
+	@At("/upload")
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object excelTo(@Param("filePath") TempFile filePath) {
+		InputStream inputStream = null;
+		Workbook book = null;
+		List<EmployeeInfo> employee = new ArrayList<EmployeeInfo>();
+		try {
+			inputStream = new FileInputStream(filePath.getFile());
+			// 找到excel表格
+			book = Workbook.getWorkbook(inputStream);
+			// 获取总列数
+			Sheet sheet = book.getSheet(0);
+			int columns = sheet.getColumns();
+			// 获取多少行
+			int rows = sheet.getRows();
+			for (int i = 0; i < rows; ++i) {
+				EmployeeInfo emp = new EmployeeInfo();
+				for (int j = 1; j <= columns; ++j) {
+					emp.seteName(sheet.getCell(1, j).getContents());
+					emp.setCompany(sheet.getCell(2, j).getContents());
+					emp.setDepartment(getDepartmentID(sheet.getCell(3, j)
+							.getContents()));
+					emp.setGender(sheet.getCell(4, j).getContents());
+					emp.setNation(sheet.getCell(5, j).getContents());
+					emp.seteAge(Integer.parseInt(sheet.getCell(6, j)
+							.getContents()));
+					emp.setBirthday(sheet.getCell(7, j).getContents());
+					emp.setEducation(sheet.getCell(8, j).getContents());
+					emp.setProfessional(sheet.getCell(9, j).getContents());
+					emp.setGraduationTime(new Date(sheet.getCell(10, j)
+							.getColumn()));
+					emp.setWorkingDate(Integer.parseInt(sheet.getCell(11, j)
+							.getContents()));
+					emp.setZcInfo(sheet.getCell(12, j).getContents());
+					emp.setRzTime(sheet.getCell(13, j).getContents());
+					emp.setZcInfo(sheet.getCell(14, j).getContents());
+					emp.setSkillLevel(sheet.getCell(15, j).getContents());
+					emp.setStatus("0");
+				}
+				employee.add(emp);
+			}
+			if (employee.size() > 0) {
+				this.dao().insert(employee);
+				return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
+			} else {
+				throw new NullPointerException();
+			}
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		} finally {
+			if (inputStream != null)
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					if (log.isDebugEnabled())
+						log.debug("E!!", e);
+					return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+				}
+			if (book != null)
+				book.close();
+		}
+	}
+
+	/**
+	 * 查询部门ID
+	 * 
+	 * @param dName
+	 * @return
+	 */
+	public int getDepartmentID(String dName) {
+		Department depart = dao().fetch(Department.class,
+				Cnd.where("dName", "=", dName));
+		if (depart == null) {
+			Department departMent = new Department();
+			departMent.setdName(dName);
+			departMent.setCreateDate(DateUtil.getCurrentDate());
+			departMent.setStatus("0");
+			return this.dao().insert(departMent).getdID();
+		} else {
+			return depart.getdID();
+		}
+	}
+
+	/**
 	 * 跳转到添加页面
 	 */
 	@At
@@ -48,6 +184,11 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 			List<Department> diList = this.dao().query(Department.class,
 					Cnd.orderBy().asc("did"));
 			map.put("departmentInfoList", diList);
+			// 获取岗位信息
+			List<JobInfos> gwInfo = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("id"));
+			if (gwInfo != null)
+				map.put("gwinfo", gwInfo);
 			return WebUtil.success(map);
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
@@ -124,7 +265,7 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 	public Object list(@Param("pageNum") int pageNum,
 			@Param("numPerPage") int numPerPage, @Param("..") EmployeeInfo obj) {
 		Pager pager = dao().createPager((pageNum < 1) ? 1 : pageNum,
-				(numPerPage < 1) ? 20 : numPerPage);
+				(numPerPage < 1) ? 30 : numPerPage);
 		List<EmployeeInfo> list = dao().query(EmployeeInfo.class,
 				bulidQureyCnd(obj), pager);
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -144,14 +285,46 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 	 * @return
 	 */
 	@At
-	public Object add(@Param("..") EmployeeInfo obj) {
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object add(@Param("..") EmployeeInfo obj,
+			@Param("picPath") TempFile picPath, HttpServletRequest request) {
+		String fileName = UploadUtil.getFileSuffix(picPath.getFile());
+		if (fileName == null)
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL, "employee");
+		String picName = UUIDUtil.get() + fileName;
+		String savePath = request.getSession().getServletContext()
+				.getRealPath("/upload");
+		FileInputStream inputStream = null;
+		FileOutputStream outputStream = null;
 		try {
+			outputStream = new FileOutputStream(savePath + "/" + picName);
+			// 保存用的数据流生成
+			inputStream = new FileInputStream(picPath.getFile());
+
+			byte[] buffer = new byte[1024];
+			int len = 0;
+			// 读入流，保存至byte数组
+			while ((len = inputStream.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, len);
+			}
+			// 设置保存图片路径
+			obj.setPicturePath("upload/" + picName);
 			dao().insert(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
 		} catch (Throwable e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
 			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+				if (outputStream != null)
+					outputStream.close();
+			} catch (Exception e2) {
+				log.debug("E!!", e2);
+				return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+			}
 		}
 	}
 
@@ -182,8 +355,9 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 	@At
 	public Object delByIds(@Param("ids") String ids) {
 		try {
-			Sql sql = Sqls.create("delete from HSE_BASE_EMPLOYEE where id in("
-					+ ids + ")");
+			Sql sql = Sqls
+					.create("delete from HSE_BASE_EMPLOYEE where empid in("
+							+ ids + ")");
 			dao().execute(sql);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK);
 		} catch (Throwable e) {

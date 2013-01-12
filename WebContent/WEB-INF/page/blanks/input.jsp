@@ -6,13 +6,14 @@
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, navTabAjaxDone);">
 		<div class="pageFormContent" layoutH="56">
-			<input type="hidden" name="tID" value="${obj.tID}">
+			<input type="hidden" name="tID" value="${obj.pID}">
+			<input type="hidden" name="type" value="填空题" />
 			<fieldset>
-				<legend>解答题添加内容</legend>
+				<legend>填空题添加内容</legend>
 				<dl class="nowrap">
 					<dt>解答题目：</dt>
 					<dd>
-						<textarea name="content" cols="80" rows="3" class="required"></textarea>
+						<textarea name="pContent" cols="80" rows="3" class="required"></textarea>
 					</dd>
 				</dl>
 				<p>
@@ -24,7 +25,7 @@
 					</select>
 				</p>
 				<p>
-					<label>岗位信息：</label> <select name="gwName" class="combox"
+					<label>岗位信息：</label> <select name="gwID" class="combox"
 						class="required">
 						<c:forEach var="di" items="${obj.gwinfo}">
 							<option value="${di.ID}">${di.gwName}</option>
@@ -33,9 +34,9 @@
 				</p>
 				<p>
 					<label>难度系数：</label> <select name="ndxs" class="combox">
-						<option value="1">一般难度</option>
-						<option value="2">中间难度</option>
-						<option value="3">高难度</option>
+						<option value="初难度">初难度</option>
+						<option value="中难度">中难度</option>
+						<option value="高难度">高难度</option>
 					</select>
 				</p>
 				<dl class="nowrap">

@@ -6,6 +6,7 @@
 	<input type="hidden" name="pageNum" value="${obj.pager.pageNumber}" />
 	<input type="hidden" name="numPerPage" value="${obj.pager.pageSize}" />
 	<input type="hidden" name="orderField" value="${param.orderField}" />
+	<input type="hidden" name="orderField" value="选择题" />
 </form>
 <div class="pageHeader">
 	<form onsubmit="return navTabSearch(this);" action="Option/list"
@@ -14,7 +15,7 @@
 			<table class="searchContent">
 				<tr>
 					<td>题目内容：<input type="text" name="content"
-						value="${obj.o.content}" /></td>
+						value="${obj.o.pContent}" /></td>
 					<td>题目状态：<input type="text" name="status"
 						value="${obj.o.status}" /></td>
 				</tr>
@@ -40,7 +41,7 @@
 				mask="true" rel="newPage" title="添加选择题信息"><span>添加</span></a></li>
 			<li><a title="确实要删除这些记录吗?" target="selectedTodo" rel="ids"
 				postType="string" href="Option/delByIds" class="delete"><span>批量删除</span></a></li>
-			<li><a class="edit" href="Option/editUi?zID={sid_eaxmOption}"
+			<li><a class="edit" href="Option/editUi?pID={sid_eaxmOption}"
 				target="dialog" mask="true" title="修改选择题信息"><span>修改</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="#" target="dwzExport"
@@ -64,21 +65,21 @@
 		</thead>
 		<tbody>
 			<c:forEach items="${obj.list}" var="acc">
-				<tr target="sid_eaxmOption" rel="${acc.zID }">
-					<td><input name="ids" value="'${acc.zID}'" type="checkbox"></td>
-					<td>${acc.content}</td>
+				<tr target="sid_eaxmOption" rel="${acc.pID }">
+					<td><input name="ids" value="'${acc.pID}'" type="checkbox"></td>
+					<td>${acc.pContent}</td>
 					<td>${acc.subjectName}</td>
-					<td>${acc.gwInfo}</td>
-					<td>${acc.type==0?'单选题':'多选题'}</td>
+					<td>${acc.gwName}</td>
+					<td>${acc.typeID==0?'单选题':'多选题'}</td>
 					<td>${acc.ndxs}</td>
 					<td>${acc.remark}</td>
 					<td>${acc.status==0?'有效':'无效'}</td>
 
 					<td><a title="删选择题信息" target="ajaxTodo"
-						href="Option/delete?zID=${acc.zID}" class="btnDel">删除选择题信息</a> <a
-						title="查看选择题信息" target="navTab" href="Option/view?zID=${acc.zID}"
+						href="Option/delete?pID=${acc.pID}" class="btnDel">删除选择题信息</a> <a
+						title="查看选择题信息" target="navTab" href="Option/view?pID=${acc.pID}"
 						class="btnView">查看选择题信息</a> <a title="编辑选择题信息" target="dialog"
-						href="Option/editUi?zID=${acc.zID}" class="btnEdit">编辑选择题信息</a></td>
+						href="Option/editUi?pID=${acc.pID}" class="btnEdit">编辑选择题信息</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>

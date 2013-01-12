@@ -1,5 +1,7 @@
 package hse.jack.util;
 
+import hse.jack.model.Account;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -7,6 +9,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.nutz.mvc.Mvcs;
 
 /**
  * 
@@ -44,7 +48,9 @@ public class WebUtil {
 	// return (Member) request.getSession().getAttribute("user");
 	// }
 	public static String getLoginUser() {
-		return "管理员";
+		Account account = (Account) Mvcs.getHttpSession().getAttribute(
+				"account");
+		return account.getDescription();
 	}
 
 	/***

@@ -6,11 +6,11 @@
 	<form method="post" action="Blanks/update" class="pageForm required-validate"
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
 		<div class="pageFormContent" layoutH="56">
-			<input type="hidden" name="tID" value="${ex.tID}">
+			<input type="hidden" name="tID" value="${ex.pID}">
 			<dl class="nowrap">
 				<dt>解答题目：</dt>
 				<dd>
-					<textarea name="content" cols="80"  rows="3" class="required">${ex.content}</textarea>
+					<textarea name="content" cols="80"  rows="3" class="required">${ex.pContent}</textarea>
 				</dd>
 			</dl>
 			<p>
@@ -22,7 +22,7 @@
 				</select>
 			</p>
 			<p>
-				<label>岗位信息：</label> <select name="gwName" class="combox"
+				<label>岗位信息：</label> <select name="gwID" class="combox"
 					class="required">
 					<c:forEach var="di" items="${obj.gwinfo}">
 						<option value="${di.ID}">${di.gwName}</option>

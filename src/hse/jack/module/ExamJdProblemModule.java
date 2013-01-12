@@ -1,6 +1,6 @@
 package hse.jack.module;
 
-import hse.jack.model.ExamJdProblem;
+import hse.jack.model.BaseProblem;
 import hse.jack.model.JobInfos;
 import hse.jack.model.TrainSubject;
 import hse.jack.util.DwzUtil;
@@ -32,8 +32,22 @@ import org.nutz.service.EntityService;
  */
 @At("/Jdt")
 @IocBean(fields = { "dao" })
-public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
+public class ExamJdProblemModule extends EntityService<BaseProblem> {
 	private static final Log log = Logs.get();
+
+	/**
+	 * 检查是不是超过现有总数
+	 * 
+	 * @param jdtNum
+	 * @return
+	 */
+	public Object IsCount(@Param("jdtNum") int jdtNum) {
+		if (jdtNum > 0 && jdtNum > this.dao().count(BaseProblem.class)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	/**
 	 * 跳转到添加页面
@@ -68,7 +82,7 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	 */
 	@At
 	@Ok("jsp:page.jdt.edit")
-	public Map<String, Object> editUi(@Param("..") ExamJdProblem obj) {
+	public Map<String, Object> editUi(@Param("..") BaseProblem obj) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			// 获取岗位信息
@@ -83,7 +97,7 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 			if (subject != null)
 				map.put("subject", subject);
 			// 获取对象
-			ExamJdProblem examJdP = this.dao().fetch(obj);
+			BaseProblem examJdP = this.dao().fetch(obj);
 			if (examJdP != null)
 				map.put("examJdP", examJdP);
 			return WebUtil.success(map);
@@ -99,7 +113,7 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	 */
 	@At
 	@Ok("jsp:page.jdt.view")
-	public ExamJdProblem view(@Param("..") ExamJdProblem obj) {
+	public BaseProblem view(@Param("..") BaseProblem obj) {
 		return dao().fetch(obj);
 	}
 
@@ -108,7 +122,27 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	 */
 	@At
 	@Ok("jsp:page.jdt.query")
-	public void queryUi() {
+	public Map<String, Object> queryUi() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			// 获取岗位信息
+			List<JobInfos> jobinfos = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("id"));
+			if (jobinfos == null)
+				return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+			map.put("gwinfo", jobinfos);
+			// 获取科目信息
+			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
+					Cnd.orderBy().asc("subID"));
+			if (subject != null)
+				map.put("subject", subject);
+
+			return WebUtil.success(map);
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("E!!", e);
+			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
+		}
 	}
 
 	/**
@@ -123,14 +157,14 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	@At
 	@Ok("jsp:page.jdt.list")
 	public Object list(@Param("pageNum") int pageNum,
-			@Param("numPerPage") int numPerPage, @Param("..") ExamJdProblem obj) {
+			@Param("numPerPage") int numPerPage, @Param("..") BaseProblem obj) {
 		Pager pager = dao().createPager((pageNum < 1) ? 1 : pageNum,
 				(numPerPage < 1) ? 20 : numPerPage);
-		List<ExamJdProblem> list = dao().query(ExamJdProblem.class,
+		List<BaseProblem> list = dao().query(BaseProblem.class,
 				bulidQureyCnd(obj), pager);
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (pager != null) {
-			pager.setRecordCount(dao().count(ExamJdProblem.class,
+			pager.setRecordCount(dao().count(BaseProblem.class,
 					bulidQureyCnd(obj)));
 			map.put("pager", pager);
 		}
@@ -140,12 +174,12 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	}
 
 	/**
-	 * 新增-ExamJdProblem
+	 * 新增-BaseProblem
 	 * 
 	 * @return
 	 */
 	@At
-	public Object add(@Param("..") ExamJdProblem obj) {
+	public Object add(@Param("..") BaseProblem obj) {
 		try {
 			dao().insert(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "eaxmjdt");
@@ -157,12 +191,12 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	}
 
 	/**
-	 * 删除-ExamJdProblem
+	 * 删除-BaseProblem
 	 * 
 	 * @return
 	 */
 	@At
-	public Object delete(@Param("..") ExamJdProblem obj) {
+	public Object delete(@Param("..") BaseProblem obj) {
 		try {
 			dao().delete(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK);
@@ -195,12 +229,12 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	}
 
 	/**
-	 * 更新-ExamJdProblem
+	 * 更新-BaseProblem
 	 * 
 	 * @return
 	 */
 	@At
-	public Object update(@Param("..") ExamJdProblem obj) {
+	public Object update(@Param("..") BaseProblem obj) {
 		try {
 			dao().update(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "eaxmjdt");
@@ -217,12 +251,12 @@ public class ExamJdProblemModule extends EntityService<ExamJdProblem> {
 	 * @param obj
 	 * @return
 	 */
-	private Cnd bulidQureyCnd(ExamJdProblem obj) {
+	private Cnd bulidQureyCnd(BaseProblem obj) {
 		Cnd cnd = null;
 		if (obj != null) {
-			cnd = Cnd.where("1", "=", 1);
-			if (!Strings.isEmpty(obj.getContent()))
-				cnd.and("dName", "=", obj.getContent());
+			cnd = Cnd.where("type", "=", "解答题");
+			if (!Strings.isEmpty(obj.getpContent()))
+				cnd.and("dName", "=", obj.getpContent());
 
 			if (!Strings.isEmpty(obj.getStatus()))
 				cnd.and("status", "=", obj.getStatus());

@@ -8,23 +8,17 @@
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
 
 		<div class="pageFormContent" layoutH="56">
-			<input type="hidden" name="eID" value="${ui.eID}">
+			<input type="hidden" name="empID" value="${ui.empID}">
 			<p>
 				<label>员工姓名：</label> <input name="eName" type="text" size="30"
 					value="${ui.eName}" class="required" maxlength="150" />
 			</p>
 			<p>
 				<label>性别：</label> <select name="gender" class="combox">
-					<option value="0">男</option>
-					<option value="1">女</option>
+					<option value="男">男</option>
+					<option value="女">女</option>
 				</select>
 			</p>
-			<!-- 
-			<p>
-				<label>描述：</label> <input name="description" type="text" size="30"
-					value="${ui.description}" maxlength="255" />
-			</p>
-			 -->
 			<p>
 				<label>部门信息：</label><select name="department" class="combox">
 					<c:forEach var="di" items="${obj.departmentInfoList}">
