@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -28,6 +29,7 @@ public class JobInfos implements Serializable {
 	private int ID;
 	/** 岗位名称 **/
 	@Column("GWNAME")
+	@Name
 	private String gwName;
 	/** 备注信息 **/
 	@Column("REMARK")

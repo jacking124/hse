@@ -128,12 +128,9 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 				}
 				employee.add(emp);
 			}
-			if (employee.size() > 0) {
+			if (employee.size() > 0)
 				this.dao().insert(employee);
-				return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
-			} else {
-				throw new NullPointerException();
-			}
+			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
@@ -304,7 +301,7 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 			byte[] buffer = new byte[1024];
 			int len = 0;
 			// 读入流，保存至byte数组
-			while ((len = inputStream.read(buffer)) > 0) {
+			while ((len = inputStream.read(buffer)) != -1) {
 				outputStream.write(buffer, 0, len);
 			}
 			// 设置保存图片路径
