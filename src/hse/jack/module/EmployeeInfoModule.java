@@ -124,6 +124,7 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 					emp.setRzTime(sheet.getCell(13, j).getContents());
 					emp.setZcInfo(sheet.getCell(14, j).getContents());
 					emp.setSkillLevel(sheet.getCell(15, j).getContents());
+					emp.setStatus("excel导入");
 					emp.setStatus("0");
 				}
 				employee.add(emp);

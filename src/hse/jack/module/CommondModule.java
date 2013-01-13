@@ -144,7 +144,7 @@ public class CommondModule extends EntityService<BaseProblem> {
 	 * @return
 	 */
 	public int getSubjectID(Cell cell) {
-		String subName = cell.getContents() == null ? "" : cell.getContents();
+		String subName = (cell.getContents() == null ? "" : cell.getContents());
 		if (!Strings.isEmpty(subName)) {
 			TrainSubject subject = this.dao()
 					.fetch(TrainSubject.class, subName);
