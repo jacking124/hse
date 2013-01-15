@@ -1,0 +1,3 @@
+2012-12-21 13:49:15,609 [main] INFO  org.nutz.log.Logs - Nutz is licensed under the Apache License, Version 2.0 .
+Report bugs : https://github.com/nutzam/nutz/issues
+2012-12-21 13:49:15,640 [main] DEBUG org.nutz.service.EntityService - Get TypeParams for self : hse.jack.model.ExamMainPaper

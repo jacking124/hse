@@ -77,7 +77,7 @@
 			<c:forEach items="${obj.list}" var="acc">
 				<tr target="sid_account" rel="${acc.ID }">
 				<td><input name="ids" value="'${acc.ID}'" type="checkbox"></td>
-					<td>${acc.userName}</td>
+					<td>${acc.ID}</td>
 					<td>${acc.description}</td>
 					<td>${acc.password}</td>
 					<td>${acc.dName}</td>

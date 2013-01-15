@@ -6,7 +6,7 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
- * <b>角色的授权信息</b>
+ * <b>角色和菜单关联实体类</b>
  * 
  * @author jack
  * @version 1.0

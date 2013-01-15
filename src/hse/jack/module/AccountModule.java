@@ -23,7 +23,6 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
@@ -156,18 +155,6 @@ public class AccountModule extends EntityService<Account> {
 	}
 
 	/**
-	 * 跳转到修改密码页面
-	 * 
-	 * @return
-	 */
-	@At
-	@Ok("jsp:page.account.passwd")
-	public Account passwdUi() {
-		Account obj = (Account) Mvcs.getHttpSession().getAttribute("account");
-		return this.dao().fetch(obj);
-	}
-
-	/**
 	 * 跳转到查看页面
 	 */
 	@At
@@ -290,10 +277,11 @@ public class AccountModule extends EntityService<Account> {
 	@At
 	public Object update(@Param("..") Account obj) {
 		try {
+			Account acc = dao().fetch(obj);
 			// 设置创建人
-			obj.setCreateUser(WebUtil.getLoginUser());
+			obj.setCreateUser(acc.getCreateUser());
 			// 设置创建时间
-			obj.setCreateDate(DateUtil.getCurrentDate());
+			obj.setCreateDate(acc.getCreateDate());
 			dao().update(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "account");
 		} catch (Throwable e) {

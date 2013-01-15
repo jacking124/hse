@@ -44,19 +44,32 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	private static final Log log = Logs.get();
 
 	/**
-	 * 跳转人工组卷
+	 * 跳转方法
 	 */
 	@At
 	@Ok("jsp:page.exam.rginput")
 	public Map<String, Object> rgaddUi() {
-		try {
-			// 从session中获取岗位信息
-			@SuppressWarnings("unchecked")
-			Map<String, Object> infos = (Map<String, Object>) Mvcs
-					.getHttpSession().getAttribute("otherInfos");
-			// 获取试题
-
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 从session中获取岗位信息
+		Map<String, Object> infos = (Map<String, Object>) Mvcs.getHttpSession()
+				.getAttribute("otherInfos");
+		// 如何session则取值
+		if (null != infos) {
 			return WebUtil.success(infos);
+		}
+		try {
+			// 获取岗位信息
+			List<JobInfos> gwinfo = this.dao().query(JobInfos.class,
+					Cnd.orderBy().asc("ID"));
+			if (gwinfo != null)
+				map.put("gwinfo", gwinfo);
+			// 获取科目信息
+			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
+					Cnd.orderBy().asc("subID"));
+			if (subject != null)
+				map.put("subject", subject);
+
+			return WebUtil.success(map);
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
@@ -64,11 +77,6 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 		}
 	}
 
-	/**
-	 * 跳转到自动组卷
-	 * 
-	 * @return
-	 */
 	@At
 	@Ok("jsp:page.exam.autoinput")
 	public Map<String, Object> autoAddUi() {
@@ -171,77 +179,16 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	}
 
 	/**
-	 * 检索不同的试题类型
-	 * 
-	 * @param pageNum
-	 * @param numPerPage
-	 * @param obj
-	 * @return
-	 */
-	@At
-	@Ok("jsp:page.exam.rginput")
-	public Object plist(@Param("pageNum") int pageNum,
-			@Param("numPerPage") int numPerPage, @Param("..") BaseProblem obj) {
-		Pager pager = dao().createPager((pageNum < 1) ? 1 : pageNum,
-				(numPerPage < 1) ? 20 : numPerPage);
-		List<BaseProblem> list = dao().query(BaseProblem.class,
-				bulidQureyCnd2(obj), pager);
-		Map<String, Object> map = new HashMap<String, Object>();
-		if (pager != null) {
-			pager.setRecordCount(dao().count(BaseProblem.class,
-					bulidQureyCnd2(obj)));
-			map.put("pager", pager);
-		}
-		map.put("o", obj);
-		map.put("list", list);
-		return map;
-	}
-
-	/**
-	 * 检索不同的试题类型查询条件
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	private Cnd bulidQureyCnd2(BaseProblem obj) {
-		Cnd cnd = null;
-		if (null != obj) {
-			cnd = Cnd.where("1", "=", "1");
-		}
-		return cnd;
-	}
-
-	/**
 	 * 人工组卷方法
 	 * 
-	 * @param ids
 	 * @param obj
 	 * @return
 	 */
 	@At
-	public Object rgAdd(@Param("ids") String ids,
-			@Param("..") ExaminationUtil obj) {
-		log.debug("============" + ids);
-		log.debug("============" + obj.getTitle());
-		try {
-			// 试卷主表
-			/*
-			 * ExamMainPaper examMain = new ExamMainPaper();
-			 * examMain.setExName(obj.getTitle());
-			 * examMain.setExScore(Integer.parseInt(obj.getExscore()));
-			 * examMain.setExNdxs(obj.getNdxs() == null ? "" : obj.getNdxs());
-			 * examMain.setExSubject(obj.getExSuject());
-			 * examMain.setGwName(obj.getGwName());
-			 * examMain.setCreateUser(WebUtil.getLoginUser());
-			 * examMain.setCreateDate(DateUtil.getCurrentDate());
-			 * examMain.setRemark(obj.getRemark()); examMain.setStatus("0");
-			 */
-		} catch (Exception e) {
-			if (log.isDebugEnabled())
-				log.debug("E!!", e);
-			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
-		}
-		return DwzUtil.dialogAjaxDone(DwzUtil.OK);
+	@Ok("")
+	public Object rgAdd(@Param("..") String sdsd) {
+
+		return null;
 	}
 
 	/**
@@ -305,6 +252,7 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 	 * @return
 	 */
 	@At
+	@Ok("json")
 	public Object autoAdd(@Param("..") ExaminationUtil obj) {
 		try {
 			// 试卷主表
@@ -482,36 +430,6 @@ public class ExamPaperModule extends EntityService<ExamMainPaper> {
 			dao().update(obj);
 			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "examMain");
 		} catch (Throwable e) {
-			if (log.isDebugEnabled())
-				log.debug("E!!", e);
-			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);
-		}
-	}
-
-	/**
-	 * 构建岗位和科目信息
-	 * 
-	 * 未完成
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	public Map<String, Object> buildRetrunValue(Object obj) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		try {
-			// 获取岗位信息
-			List<JobInfos> gwinfo = this.dao().query(JobInfos.class,
-					Cnd.orderBy().asc("ID"));
-			if (gwinfo != null)
-				map.put("gwinfo", gwinfo);
-			// 获取科目信息
-			List<TrainSubject> subject = this.dao().query(TrainSubject.class,
-					Cnd.orderBy().asc("subID"));
-			if (subject != null)
-				map.put("subject", subject);
-
-			return WebUtil.success(map);
-		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
 			return DwzUtil.dialogAjaxDone(DwzUtil.FAIL);

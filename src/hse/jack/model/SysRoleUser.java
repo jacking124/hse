@@ -6,7 +6,7 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
- * <b>角色和用户关联表</b> 存储用户的角色
+ * <b>角色和用户关联表</b>
  * 
  * @author Administrator
  * @version 1.0

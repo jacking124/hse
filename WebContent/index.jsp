@@ -148,7 +148,7 @@
 				<div class="accordion" fillSpace="sidebar">
 					<div class="accordionHeader">
 						<h2>
-							<span>Folder</span>功能菜单
+							<span>Folder</span>界面组件
 						</h2>
 					</div>
 					<div class="accordionContent">
@@ -176,7 +176,7 @@
 									<li><a href="Employee/list" target="navTab" rel="employee">员工信息管理</a></li>
 									<li><a href="Tsub/list" target="navTab" rel="trainSubject">科目信息管理</a></li>
 								</ul></li>
-							<li><a>题库信息管理</a>
+							<li><a>试题信息管理</a>
 								<ul>
 								
 									<li><a href="blanks/list" target="navTab" rel="blanks">填空题信息管理</a></li>
@@ -262,6 +262,7 @@
 				</ul>
 				<div class="navTab-panel tabsPageContent layoutBox">
 					<div class="page unitBox">
+						  
 						<div class="accountInfo">
 						<!--
 							<div class="alertInfo">

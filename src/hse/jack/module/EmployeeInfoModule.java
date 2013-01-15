@@ -124,14 +124,16 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 					emp.setRzTime(sheet.getCell(13, j).getContents());
 					emp.setZcInfo(sheet.getCell(14, j).getContents());
 					emp.setSkillLevel(sheet.getCell(15, j).getContents());
-					emp.setStatus("excel导入");
 					emp.setStatus("0");
 				}
 				employee.add(emp);
 			}
-			if (employee.size() > 0)
+			if (employee.size() > 0) {
 				this.dao().insert(employee);
-			return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
+				return DwzUtil.dialogAjaxDone(DwzUtil.OK, "employee");
+			} else {
+				throw new NullPointerException();
+			}
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.debug("E!!", e);
@@ -302,7 +304,7 @@ public class EmployeeInfoModule extends EntityService<EmployeeInfo> {
 			byte[] buffer = new byte[1024];
 			int len = 0;
 			// 读入流，保存至byte数组
-			while ((len = inputStream.read(buffer)) != -1) {
+			while ((len = inputStream.read(buffer)) > 0) {
 				outputStream.write(buffer, 0, len);
 			}
 			// 设置保存图片路径

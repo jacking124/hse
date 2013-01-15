@@ -8,7 +8,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
-import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -27,7 +26,6 @@ public class TrainSubject implements Serializable {
 	private int subID;
 	/** 培训科目 **/
 	@Column
-	@Name
 	private String subName;
 	/** 备注 **/
 	@Column

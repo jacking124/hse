@@ -6,7 +6,6 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
 /***
- * <b>存储用户的授权信息</b>
  * 
  * @author jack
  * @version 1.0
